@@ -109,7 +109,7 @@ def save_params(weights_path,
     """
     
     if use_wandb:
-        wandb.init(project=project_name, name=save_path+"-"+model_name, tags=[model_name], group="train")
+        wandb.init(project=project_name, name=save_path, tags=[model_name], group="train")
 
         # if os.path.isfile(os.path.join(weights_path, "train.csv")):
         #     wandb.init(project="skin-research", name=save_path+"-"+model_name, resume=True)
@@ -226,6 +226,34 @@ def get_testloader(image_path,
     
     return test_dataloader
 
+def select_labels(foramen, phase="train"):
+    if phase == "train":
+        if foramen == 34:
+            return "label/train-34.csv", "label/val-34.csv"
+        elif foramen == 45:
+            return "label/train-45.csv", "label/val-45.csv"
+        elif foramen == 56:
+            return "label/train-56.csv", "label/val-56.csv"
+        elif foramen == 67:
+            return "label/train-67.csv", "label/val-67.csv"
+        elif foramen == 71:
+            return "label/train-71.csv", "label/val-71.csv"
+        else:
+            return "label/train.csv", "label/val.csv"
+    elif phase == "test":
+        if foramen == 34:
+            return "label/test-34.csv"
+        elif foramen == 45:
+            return "label/test-45.csv"
+        elif foramen == 56:
+            return "label/test-56.csv"
+        elif foramen == 67:
+            return "label/test-67.csv"
+        elif foramen == 71:
+            return "label/test-71.csv"
+        else:
+            return "label/test.csv"
+        
 class CustomImageDataset(Dataset):
     def __init__(self, annotations_file, img_dir=None, transform=None, target_transform=None, phase=None):
         """

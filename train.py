@@ -249,6 +249,7 @@ def train(dataset_path,
           batch_size=8,
           num_workers=10,
           resume=False,
+          foramen=0,
           use_wandb=True,
           project_name=None,
           start=0):
@@ -270,8 +271,8 @@ def train(dataset_path,
     # device = torch.device("cpu")
     # device = torch.device("mps")
     
-    print("save weights in {}....".format(save_path))
-    print("save hyperparmeters......")
+    print("save weights in {}.....".format(save_path))
+    print("save hyperparmeters.....")
     
     # hyperparmeters 저장하기 + wandb init
     save_params(os.path.join("weights", save_path),
@@ -289,11 +290,17 @@ def train(dataset_path,
                 use_wandb,
                 project_name)
     
+    # foramen 별로 레이블 고르기
+    train_label, val_label = select_labels(foramen)
+    print("select labels.....")
+    print(train_label)
+    print(val_label)
+    
     # dataloaders
     trainloader, testloader = dataloader(os.path.join(dataset_path, "train"),
                                          os.path.join(dataset_path, "val"),
-                                        [os.path.join(dataset_path, "label/train.csv"),
-                                         os.path.join(dataset_path, "label/val.csv")],
+                                        [os.path.join(dataset_path, train_label),
+                                         os.path.join(dataset_path, val_label)],
                                          input_size=input_size,
                                          batch_size=batch_size,
                                          num_workers=num_workers)
@@ -312,7 +319,7 @@ def train(dataset_path,
     weights = compute_class_weight(class_weight = "balanced", classes=np.array(range(num_classes)), y = df["label"])
     weights = torch.FloatTensor(weights)
     criterion = nn.CrossEntropyLoss(weight=weights)
-
+ 
     # opimizer
     # https://pytorch.org/docs/stable/optim.html
     if optimize=="adam":
